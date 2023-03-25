@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Deserializer deserializes the jsonapi.org example into an object graph 1`] = `
+[
+  {
+    "author": {
+      "firstName": "Dan",
+      "id": 9,
+      "lastName": "Gebhardt",
+      "twitter": "dgeb",
+    },
+    "comments": [
+      {
+        "author": {
+          "firstName": "John",
+          "id": 2,
+          "lastName": "Doe",
+          "twitter": "jdoe",
+        },
+        "body": "First!",
+        "id": 5,
+      },
+      {
+        "author": {
+          "firstName": "Dan",
+          "id": 9,
+          "lastName": "Gebhardt",
+          "twitter": "dgeb",
+        },
+        "body": "I like XML better",
+        "id": 12,
+      },
+    ],
+    "id": 1,
+    "title": "JSON:API paints my bikeshed!",
+  },
+]
+`;
