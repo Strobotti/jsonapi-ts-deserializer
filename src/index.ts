@@ -99,7 +99,9 @@ export class Deserializer implements RelationshipDeserializer {
     const relationshipItem = this.entityStoreCollection[relationship.type][relationship.id];
 
     if (!relationshipItem) {
-      throw new Error(`Relationship "${name}" defined for entity  {id: "${item.id}", type: "${item.type}"} not found with {id: "${relationship.id}", type "${relationship.type}"}`)
+      throw new Error(
+        `Relationship "${name}" defined for entity  {id: "${item.id}", type: "${item.type}"} not found with {id: "${relationship.id}", type "${relationship.type}"}`,
+      );
     }
 
     return this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this);
@@ -114,7 +116,9 @@ export class Deserializer implements RelationshipDeserializer {
       const relationshipItem = this.entityStoreCollection[relationship.type][relationship.id];
 
       if (!relationshipItem) {
-        throw new Error(`Relationship "${name}" defined for entity  {id: "${item.id}", type: "${item.type}"} not found with {id: "${relationship.id}", type "${relationship.type}"}`)
+        throw new Error(
+          `Relationship "${name}" defined for entity  {id: "${item.id}", type: "${item.type}"} not found with {id: "${relationship.id}", type "${relationship.type}"}`,
+        );
       }
 
       ret.push(this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this));
