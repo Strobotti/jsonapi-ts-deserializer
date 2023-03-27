@@ -189,7 +189,7 @@ const fileSystemExampleData = {
           ],
         },
       },
-    }
+    },
   ],
   included: [
     {
@@ -208,7 +208,7 @@ const fileSystemExampleData = {
             {
               type: 'folders',
               id: '5',
-            }
+            },
           ],
         },
       },
@@ -232,51 +232,51 @@ const fileSystemExampleData = {
       id: '5',
       attributes: {
         name: 'juha',
-      }
-    }
-  ]
-}
+      },
+    },
+  ],
+};
 
 type Folder = {
-    id: number;
-    name: string;
-    children: (Folder | File)[];
-}
+  id: number;
+  name: string;
+  children: (Folder | File)[];
+};
 
 type File = {
-    id: number;
-    name: string;
-}
+  id: number;
+  name: string;
+};
 
 class FolderDeserializer implements ItemDeserializer {
-    getType(): string {
-        return 'folders';
-    }
+  getType(): string {
+    return 'folders';
+  }
 
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
-        const folder: Folder = {
-            id: parseInt(item.id),
-            name: item.attributes.name,
-            children: [],
-        };
+  deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+    const folder: Folder = {
+      id: parseInt(item.id),
+      name: item.attributes.name,
+      children: [],
+    };
 
-        folder.children = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'children');
+    folder.children = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'children');
 
-        return folder;
-    }
+    return folder;
+  }
 }
 
 class FileDeserializer implements ItemDeserializer {
-    getType(): string {
-        return 'files';
-    }
+  getType(): string {
+    return 'files';
+  }
 
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
-        return {
-            id: parseInt(item.id),
-            name: item.attributes.name,
-        };
-    }
+  deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+    return {
+      id: parseInt(item.id),
+      name: item.attributes.name,
+    };
+  }
 }
 
 describe('Deserializer', () => {
@@ -293,13 +293,10 @@ describe('Deserializer', () => {
   });
 
   it('deserializes a file system example into an object graph', () => {
-    const deserializer = getDeserializer([
-        new FolderDeserializer(),
-        new FileDeserializer(),
-    ]);
+    const deserializer = getDeserializer([new FolderDeserializer(), new FileDeserializer()]);
 
     const rootItems: any[] = deserializer.consume(fileSystemExampleData).getRootItems();
 
     expect(rootItems).toMatchSnapshot();
   });
-})
+});
