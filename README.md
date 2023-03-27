@@ -12,190 +12,72 @@ npm i jsonapi-ts-deserializer
 
 ## Usage
 
-### Example
-
-This example uses the jsonapi.org sample data (added the missing person, though) and builds an object-graph out of it:
-
 ```typescript
-// Import the package and required interfaces:
-import {getDeserializer, Item, ItemDeserializer, RelationshipDeserializer} from "jsonapi-ts-deserializer";
+import { getDeserializer, ItemDeserializer, RelationshipDeserializer } from 'jsonapi-ts-deserializer';
 
-// Have some data to deserialize:
-const jsonapiOrgExampleData = {
-    "links": {
-        "self": "http://example.com/articles",
-        "next": "http://example.com/articles?page[offset]=2",
-        "last": "http://example.com/articles?page[offset]=10"
-    },
-    "data": [{
-        "type": "articles",
-        "id": "1",
-        "attributes": {
-            "title": "JSON:API paints my bikeshed!"
-        },
-        "relationships": {
-            "author": {
-                "links": {
-                    "self": "http://example.com/articles/1/relationships/author",
-                    "related": "http://example.com/articles/1/author"
-                },
-                "data": { "type": "people", "id": "9" }
-            },
-            "comments": {
-                "links": {
-                    "self": "http://example.com/articles/1/relationships/comments",
-                    "related": "http://example.com/articles/1/comments"
-                },
-                "data": [
-                    { "type": "comments", "id": "5" },
-                    { "type": "comments", "id": "12" }
-                ]
-            }
-        },
-        "links": {
-            "self": "http://example.com/articles/1"
-        }
-    }],
-    "included": [
-        {
-            "type": "people",
-            "id": "9",
-            "attributes": {
-                "firstName": "Dan",
-                "lastName": "Gebhardt",
-                "twitter": "dgeb"
-            },
-            "links": {
-                "self": "http://example.com/people/9"
-            }
-        },
-        {
-            "type": "people",
-            "id": "2",
-            "attributes": {
-                "firstName": "John",
-                "lastName": "Doe",
-                "twitter": "jdoe"
-            },
-            "links": {
-                "self": "http://example.com/people/2"
-            }
-        },
-        {
-            "type": "comments",
-            "id": "5",
-            "attributes": {
-                "body": "First!"
-            },
-            "relationships": {
-                "author": {
-                    "data": { "type": "people", "id": "2" }
-                }
-            },
-            "links": {
-                "self": "http://example.com/comments/5"
-            }
-        }, {
-            "type": "comments",
-            "id": "12",
-            "attributes": {
-                "body": "I like XML better"
-            },
-            "relationships": {
-                "author": {
-                    "data": { "type": "people", "id": "9" }
-                }
-            },
-            "links": {
-                "self": "http://example.com/comments/12"
-            }
-        }
-    ]
-}
-
-// have some types to deserialize to:
-type Article = {
+// Introduce types for your entities, the folder:
+type Folder = {
     id: number;
-    title: string;
-    author?: Person;
-    comments: Comment[];
+    name: string;
+    children: (Folder | File)[];
 }
 
-type Person = {
+// and the file:
+type File = {
     id: number;
-    firstName: string;
-    lastName: string;
-    twitter: string;
+    name: string;
 }
 
-type Comment = {
-    id: number;
-    body: string;
-    author?: Person;
-}
-
-// implement deserializers for these entities:
-class ArticleDeserializer implements ItemDeserializer {
+// Create a deserializer for the folder:
+class FolderDeserializer implements ItemDeserializer {
     getType(): string {
-        return "articles"
+        return 'folders';
     }
 
     deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
-        const article: Article = {
+        const folder: Folder = {
             id: parseInt(item.id),
-            title: item.attributes.title,
-            comments: [],
-        }
+            name: item.attributes.name,
+            children: [],
+        };
 
-        article.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
-        article.comments = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'comments');
+        folder.children = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'children');
 
-        return article
+        return folder;
     }
 }
 
-class PersonDeserializer implements ItemDeserializer {
+// ...and also for the file:
+class FileDeserializer implements ItemDeserializer {
     getType(): string {
-        return "people"
+        return 'files';
     }
 
     deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
         return {
             id: parseInt(item.id),
-            firstName: item.attributes.firstName,
-            lastName: item.attributes.lastName,
-            twitter: item.attributes.twitter,
-        }
-    }
-}
-
-class CommentDeserializer implements ItemDeserializer {
-    getType(): string {
-        return "comments"
-    }
-
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
-        const comment:Comment = {
-            id: parseInt(item.id),
-            body: item.attributes.body,
+            name: item.attributes.name,
         };
-
-        comment.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
-
-        return comment
     }
 }
 
-// instantiate the deserializer with the entity deserializers registered:
+// create the deserializer with the folder and file deserializers registered:
 const deserializer = getDeserializer([
-    new ArticleDeserializer(),
-    new PersonDeserializer(),
-    new CommentDeserializer(),
-])
+    new FolderDeserializer(),
+    new FileDeserializer(),
+]);
 
-// consume the data and pull out the object graph (which is an array of entities in this particular example)
-const rootItems:any[] = deserializer.consume(jsonapiOrgExampleData).getRootItems()
+// Fetch your JSON:API data:
+const yourJsonData = fetch('https://api.example.com/api/folders');
+
+// consume it and get the root items with the complete object-graph:
+const rootItems: any[] = deserializer.consume(yourJsonData).getRootItems();
 ```
+
+### Examples
+
+* [The JSON from the jsonapi.org example](docs/examples/jsonapiorg/README.md)
+* [A small filesystem tree, with some recursion](docs/examples/filesystem/README.md)
 
 ## Credits
 
