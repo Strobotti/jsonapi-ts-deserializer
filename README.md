@@ -1,5 +1,9 @@
 # JSON:API deserializer in Typescript
 
+A JSON:API response payload is a normalized set of entities and their relationships plus some metadata. This package
+deserializes a JSON:API response payload into an object graph, using user-defined entity deserializers to build the
+actual entities.
+
 ## Installation
 
 ```shell
@@ -14,7 +18,7 @@ This example uses the jsonapi.org sample data (added the missing person, though)
 
 ```typescript
 // Import the package and required interfaces:
-import {Item, ItemDeserializer, RelationshipDeserializer} from "jsonapi-ts-deserializer";
+import {getDeserializer, Item, ItemDeserializer, RelationshipDeserializer} from "jsonapi-ts-deserializer";
 
 // Have some data to deserialize:
 const jsonapiOrgExampleData = {

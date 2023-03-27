@@ -1,5 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Deserializer deserializes a file system example into an object graph 1`] = `
+[
+  {
+    "children": [
+      {
+        "children": [
+          {
+            "id": 4,
+            "name": "README.md",
+          },
+          {
+            "children": [],
+            "id": 5,
+            "name": "juha",
+          },
+        ],
+        "id": 2,
+        "name": "home",
+      },
+      {
+        "id": 3,
+        "name": "swapfile",
+      },
+    ],
+    "id": 1,
+    "name": "root",
+  },
+]
+`;
+
 exports[`Deserializer deserializes the jsonapi.org example into an object graph 1`] = `
 [
   {

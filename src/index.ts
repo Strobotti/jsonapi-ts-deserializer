@@ -108,8 +108,9 @@ export class Deserializer implements RelationshipDeserializer {
   }
 
   deserializeRelationships(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any[] {
-    const relationships = item.relationships[name].data;
+    if (!item?.relationships || !item.relationships[name]) return [];
 
+    const relationships = item.relationships[name].data;
     const ret: any[] = [];
 
     relationships.forEach((relationship: any) => {
