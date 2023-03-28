@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v1.1.2...v1.1.3) (2023-03-28)
+
+
+### Bug Fixes
+
+* conflicting license ([f4ac569](https://github.com/Strobotti/jsonapi-ts-deserializer/commit/f4ac569f9410a8c000c6ffde366f54265b99f383))
+
 ## [1.1.2](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v1.1.1...v1.1.2) (2023-03-28)
 
 
