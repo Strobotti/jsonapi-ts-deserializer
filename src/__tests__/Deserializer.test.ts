@@ -237,6 +237,74 @@ const fileSystemExampleData = {
   ],
 };
 
+const fileSystemExampleData2 = {
+  data: {
+    type: 'folders',
+    id: '1',
+    attributes: {
+      name: 'root',
+    },
+    relationships: {
+      children: {
+        data: [
+          {
+            type: 'folders',
+            id: '2',
+          },
+          {
+            type: 'files',
+            id: '3',
+          },
+        ],
+      },
+    },
+  },
+  included: [
+    {
+      type: 'folders',
+      id: '2',
+      attributes: {
+        name: 'home',
+      },
+      relationships: {
+        children: {
+          data: [
+            {
+              type: 'files',
+              id: '4',
+            },
+            {
+              type: 'folders',
+              id: '5',
+            },
+          ],
+        },
+      },
+    },
+    {
+      type: 'files',
+      id: '3',
+      attributes: {
+        name: 'swapfile',
+      },
+    },
+    {
+      type: 'files',
+      id: '4',
+      attributes: {
+        name: 'README.md',
+      },
+    },
+    {
+      type: 'folders',
+      id: '5',
+      attributes: {
+        name: 'juha',
+      },
+    },
+  ],
+};
+
 type Folder = {
   id: number;
   name: string;
@@ -298,5 +366,13 @@ describe('Deserializer', () => {
     const rootItems: any[] = deserializer.consume(fileSystemExampleData).getRootItems();
 
     expect(rootItems).toMatchSnapshot();
+  });
+
+  it('deserializes the second file system example (single entity) into an object graph', () => {
+    const deserializer = getDeserializer([new FolderDeserializer(), new FileDeserializer()]);
+
+    const rootItem: Folder = deserializer.consume(fileSystemExampleData2).getRootItem();
+
+    expect(rootItem).toMatchSnapshot();
   });
 });
