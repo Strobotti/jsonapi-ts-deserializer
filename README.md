@@ -1,5 +1,7 @@
 # JSON:API deserializer in Typescript
 
+![cov](https://strobotti.github.io/jsonapi-ts-deserializer/badges/coverage.svg)
+
 A JSON:API response payload is a normalized set of entities and their relationships plus some metadata. This package
 deserializes a JSON:API response payload into an object graph, using user-defined entity deserializers to build the
 actual entities.
