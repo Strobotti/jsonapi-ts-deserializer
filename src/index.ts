@@ -56,6 +56,9 @@ export class Deserializer implements RelationshipDeserializer {
     return this;
   }
 
+  /**
+   * Returns the root item from the JSON:API data, with any relationships embedded.
+   */
   public getRootItem(): any {
     if (Object.keys(this.rootItems).length === 0) {
       return null;
@@ -67,15 +70,13 @@ export class Deserializer implements RelationshipDeserializer {
 
     const item = this.rootItems[Object.keys(this.rootItems)[0]];
     const type = item.type;
-    const itemDeserializer = this.itemDeserializerRegistry[type];
 
-    if (!itemDeserializer) {
-      throw new Error(`An ItemDeserializer for type ${type} is not registered.`);
-    }
-
-    return itemDeserializer.deserialize(item, this);
+    return this.getDeserializerForType(type).deserialize(item, this);
   }
 
+  /**
+   * Returns the root items (as an array) from the JSON:API data, with any relationships embedded.
+   */
   public getRootItems(): any[] {
     if (Object.keys(this.rootItems).length === 0) {
       return [];
@@ -92,40 +93,63 @@ export class Deserializer implements RelationshipDeserializer {
     return items;
   }
 
-  deserializeRelationship(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any {
+  /**
+   * Parses and wires the relationship with the given name for the given item.
+   *
+   * @param relationshipDeserializer
+   * @param item
+   * @param name
+   */
+  public deserializeRelationship(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any {
     if (!item?.relationships || !item.relationships[name]) return null;
 
     const relationship = item.relationships[name].data;
-    const relationshipItem = this.entityStoreCollection[relationship.type][relationship.id];
+    let relationshipItem: Item;
 
-    if (!relationshipItem) {
-      throw new Error(
-        `Relationship "${name}" defined for entity  {id: "${item.id}", type: "${item.type}"} not found with {id: "${relationship.id}", type "${relationship.type}"}`,
-      );
+    try {
+      relationshipItem = this.getItemByTypeAndId(relationship.type, relationship.id);
+    } catch (e) {
+      throw new Error(`Failed to fetch relationship "${name}" for entity {id: "${item.id}", type: "${item.type}"}: ${e}`);
     }
 
     return this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this);
   }
 
-  deserializeRelationships(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any[] {
+  /**
+   * Parses and wires the relationships with the given name for the given item. Returns an array of deserialized items.
+   *
+   * @param relationshipDeserializer
+   * @param item
+   * @param name
+   */
+  public deserializeRelationships(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any[] {
     if (!item?.relationships || !item.relationships[name]) return [];
 
-    const relationships = item.relationships[name].data;
     const ret: any[] = [];
 
-    relationships.forEach((relationship: any) => {
-      const relationshipItem = this.entityStoreCollection[relationship.type][relationship.id];
+    item.relationships[name].data.forEach((relationship: any) => {
+      let relationshipItem: Item;
 
-      if (!relationshipItem) {
-        throw new Error(
-          `Relationship "${name}" defined for entity  {id: "${item.id}", type: "${item.type}"} not found with {id: "${relationship.id}", type "${relationship.type}"}`,
-        );
+      try {
+        relationshipItem = this.getItemByTypeAndId(relationship.type, relationship.id);
+      } catch (e) {
+        throw new Error(`Failed to fetch relationship "${name}" for entity {id: "${item.id}", type: "${item.type}"}: ${e}`);
       }
 
       ret.push(this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this));
     });
 
     return ret;
+  }
+
+  private getItemByTypeAndId(type: string, id: string): Item {
+    const item = this.entityStoreCollection[type][id];
+
+    if (!item) {
+      throw new Error(`Entity {id: "${id}", type: "${type}"} not found.`);
+    }
+
+    return item;
   }
 
   private getDeserializerForType(type: string): ItemDeserializer {
