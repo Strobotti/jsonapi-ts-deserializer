@@ -191,6 +191,9 @@ export class Deserializer implements RelationshipDeserializer {
   }
 }
 
+/**
+ * Returns a Deserializer with the given ItemDeserializers registered.
+ */
 export function getDeserializer(itemDeserializers: ItemDeserializer[]): Deserializer {
   const deserializer: Deserializer = new Deserializer();
 
