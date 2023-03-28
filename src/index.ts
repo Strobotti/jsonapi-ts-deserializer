@@ -109,7 +109,9 @@ export class Deserializer implements RelationshipDeserializer {
     try {
       relationshipItem = this.getItemByTypeAndId(relationship.type, relationship.id);
     } catch (e) {
-      throw new Error(`Failed to fetch relationship "${name}" for entity {id: "${item.id}", type: "${item.type}"}: ${e}`);
+      throw new Error(
+        `Failed to fetch relationship "${name}" for entity {id: "${item.id}", type: "${item.type}"}: ${e}`,
+      );
     }
 
     return this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this);
@@ -133,7 +135,9 @@ export class Deserializer implements RelationshipDeserializer {
       try {
         relationshipItem = this.getItemByTypeAndId(relationship.type, relationship.id);
       } catch (e) {
-        throw new Error(`Failed to fetch relationship "${name}" for entity {id: "${item.id}", type: "${item.type}"}: ${e}`);
+        throw new Error(
+          `Failed to fetch relationship "${name}" for entity {id: "${item.id}", type: "${item.type}"}: ${e}`,
+        );
       }
 
       ret.push(this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this));
