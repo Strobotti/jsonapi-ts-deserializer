@@ -76,8 +76,16 @@ const rootItems: any[] = deserializer.consume(yourJsonData).getRootItems();
 
 ### Examples
 
-* [The JSON from the jsonapi.org example](docs/examples/jsonapiorg/README.md)
-* [A small filesystem tree, with some recursion](docs/examples/filesystem/README.md)
+* [The JSON from the jsonapi.org example](docs/examples/jsonapiorg)
+* [A small filesystem tree, with some recursion](docs/examples/filesystem)
+
+## TODO
+
+At least the following things are in the backlog:
+
+* [ ] Ditch the classes in the entity deserializers and use types instead
+* [ ] Consider caching the deserialized entities and reusing them
+* [ ] Come up with a spectacular logo for this package
 
 ## Credits
 
