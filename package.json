@@ -27,7 +27,7 @@
     "JSON:API"
   ],
   "author": "Juha Jantunen <juha@strobotti.com> (https://www.strobotti.com)",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Strobotti/jsonapi-ts-deserializer/issues"
   },
