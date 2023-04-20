@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "jsonapi-ts-deserializer": "^1.1.2"
+    "jsonapi-ts-deserializer": "^2.0.0"
   }
 }

@@ -115,12 +115,9 @@ type Comment = {
 }
 
 // implement deserializers for these entities:
-class ArticleDeserializer implements ItemDeserializer {
-    getType(): string {
-        return "articles"
-    }
-
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const articleDeserializer : ItemDeserializer<Article> = {
+    type: "articles",
+    deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Article => {
         const article: Article = {
             id: parseInt(item.id),
             title: item.attributes.title,
@@ -134,12 +131,9 @@ class ArticleDeserializer implements ItemDeserializer {
     }
 }
 
-class PersonDeserializer implements ItemDeserializer {
-    getType(): string {
-        return "people"
-    }
-
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const personDeserializer : ItemDeserializer<Person> = {
+    type: "people",
+    deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Person => {
         return {
             id: parseInt(item.id),
             firstName: item.attributes.firstName,
@@ -149,12 +143,9 @@ class PersonDeserializer implements ItemDeserializer {
     }
 }
 
-class CommentDeserializer implements ItemDeserializer {
-    getType(): string {
-        return "comments"
-    }
-
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const commentDeserializer : ItemDeserializer<Comment> = {
+    type: "comments",
+    deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Comment => {
         const comment:Comment = {
             id: parseInt(item.id),
             body: item.attributes.body,
@@ -168,9 +159,9 @@ class CommentDeserializer implements ItemDeserializer {
 
 // instantiate the deserializer with the entity deserializers registered:
 const deserializer = getDeserializer([
-    new ArticleDeserializer(),
-    new PersonDeserializer(),
-    new CommentDeserializer(),
+    articleDeserializer,
+    personDeserializer,
+    commentDeserializer,
 ])
 
 // consume the data and pull out the object graph (which is an array of entities in this particular example)

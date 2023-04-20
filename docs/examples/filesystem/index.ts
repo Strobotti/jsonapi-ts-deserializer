@@ -81,12 +81,9 @@ type File = {
     name: string;
 }
 
-class FolderDeserializer implements ItemDeserializer {
-    getType(): string {
-        return 'folders';
-    }
-
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const folderDeserializer : ItemDeserializer<Folder> = {
+    type: 'folders',
+    deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Folder => {
         const folder: Folder = {
             id: parseInt(item.id),
             name: item.attributes.name,
@@ -99,12 +96,9 @@ class FolderDeserializer implements ItemDeserializer {
     }
 }
 
-class FileDeserializer implements ItemDeserializer {
-    getType(): string {
-        return 'files';
-    }
-
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const fileDeserializer : ItemDeserializer<File> = {
+    type: 'files',
+    deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): File => {
         return {
             id: parseInt(item.id),
             name: item.attributes.name,
@@ -113,8 +107,8 @@ class FileDeserializer implements ItemDeserializer {
 }
 
 const deserializer = getDeserializer([
-    new FolderDeserializer(),
-    new FileDeserializer(),
+    folderDeserializer,
+    fileDeserializer,
 ]);
 
 const rootItems: any[] = deserializer.consume(fileSystemExampleData).getRootItems();
