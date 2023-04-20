@@ -9,23 +9,19 @@ export type Item = {
   meta?: any;
 };
 
-export interface ItemDeserializer {
+export type ItemDeserializer<T> = {
   /**
-   * Must return the type of entity, for example "articles" or "comments"
+   * The type of entity, for example "articles" or "comments"
    */
-  getType(): string;
+  type: string;
 
   /**
-   * Must return an object deserialized based on given data (of type Item).
+   * A function that returns an object (of type T) deserialized based on given data (of type Item).
    *
-   * Any relationships can be populated by using the RelationshipDeserializer that is passed along.
-   * - use the deserializeRelationship() -method if the relationship is 1:1
-   * - use the deserializeRelationships() -method if the relationship is one-to-many
-   *
-   * @param data
-   * @param deserializer
+   * @param item
+   * @param relationshipDeserializer
    */
-  deserialize(data: Item, deserializer: Deserializer): any;
+  deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer) => T;
 }
 
 /**
@@ -38,7 +34,7 @@ type EntityStore = { [key: string]: Item };
  */
 type EntityStoreCollection = { [key: string]: EntityStore };
 
-type ItemDeserializerRegistry = { [key: string]: ItemDeserializer };
+type ItemDeserializerRegistry = { [key: string]: ItemDeserializer<any> };
 
 export interface RelationshipDeserializer {
   deserializeRelationship(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any;
@@ -50,8 +46,8 @@ export class Deserializer implements RelationshipDeserializer {
   private entityStoreCollection: EntityStoreCollection = {};
   private itemDeserializerRegistry: ItemDeserializerRegistry = {};
 
-  public registerItemDeserializer(itemDeserializer: ItemDeserializer): Deserializer {
-    this.itemDeserializerRegistry[itemDeserializer.getType()] = itemDeserializer;
+  public registerItemDeserializer(itemDeserializer: ItemDeserializer<any>): Deserializer {
+    this.itemDeserializerRegistry[itemDeserializer.type] = itemDeserializer;
 
     return this;
   }
@@ -156,7 +152,7 @@ export class Deserializer implements RelationshipDeserializer {
     return item;
   }
 
-  private getDeserializerForType(type: string): ItemDeserializer {
+  private getDeserializerForType(type: string): ItemDeserializer<any> {
     const deserializer = this.itemDeserializerRegistry[type];
     if (!deserializer) {
       throw new Error(`An ItemDeserializer for type ${type} is not registered.`);
@@ -198,10 +194,10 @@ export class Deserializer implements RelationshipDeserializer {
 /**
  * Returns a Deserializer with the given ItemDeserializers registered.
  */
-export function getDeserializer(itemDeserializers: ItemDeserializer[]): Deserializer {
+export function getDeserializer(itemDeserializers: ItemDeserializer<any>[]): Deserializer {
   const deserializer: Deserializer = new Deserializer();
 
-  itemDeserializers.forEach((itemDeserializer: ItemDeserializer) => {
+  itemDeserializers.forEach((itemDeserializer: ItemDeserializer<any>) => {
     deserializer.registerItemDeserializer(itemDeserializer);
   });
 

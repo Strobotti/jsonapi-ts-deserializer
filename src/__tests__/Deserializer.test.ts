@@ -115,12 +115,9 @@ type Comment = {
   author?: Person;
 };
 
-class ArticleDeserializer implements ItemDeserializer {
-  getType(): string {
-    return 'articles';
-  }
-
-  deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const ArticleDeserializer : ItemDeserializer<Article> = {
+  type: 'articles',
+  deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Article => {
     const article: Article = {
       id: parseInt(item.id),
       title: item.attributes.title,
@@ -134,27 +131,21 @@ class ArticleDeserializer implements ItemDeserializer {
   }
 }
 
-class PersonDeserializer implements ItemDeserializer {
-  getType(): string {
-    return 'people';
-  }
-
-  deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const PersonDeserializer : ItemDeserializer<Person> = {
+  type: 'people',
+  deserialize: (item: Item, _: RelationshipDeserializer): Person => {
     return {
       id: parseInt(item.id),
       firstName: item.attributes.firstName,
       lastName: item.attributes.lastName,
       twitter: item.attributes.twitter,
-    };
-  }
+    }
+  },
 }
 
-class CommentDeserializer implements ItemDeserializer {
-  getType(): string {
-    return 'comments';
-  }
-
-  deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const CommentDeserializer : ItemDeserializer<Comment> = {
+  type: 'comments',
+  deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Comment => {
     const comment: Comment = {
       id: parseInt(item.id),
       body: item.attributes.body,
@@ -316,12 +307,9 @@ type File = {
   name: string;
 };
 
-class FolderDeserializer implements ItemDeserializer {
-  getType(): string {
-    return 'folders';
-  }
-
-  deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const FolderDeserializer : ItemDeserializer<Folder> = {
+  type: 'folders',
+  deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Folder => {
     const folder: Folder = {
       id: parseInt(item.id),
       name: item.attributes.name,
@@ -331,15 +319,12 @@ class FolderDeserializer implements ItemDeserializer {
     folder.children = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'children');
 
     return folder;
-  }
+  },
 }
 
-class FileDeserializer implements ItemDeserializer {
-  getType(): string {
-    return 'files';
-  }
-
-  deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const FileDeserializer: ItemDeserializer<File> = {
+  type: 'files',
+  deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): File => {
     return {
       id: parseInt(item.id),
       name: item.attributes.name,
@@ -349,10 +334,10 @@ class FileDeserializer implements ItemDeserializer {
 
 describe('Deserializer', () => {
   it('deserializes the jsonapi.org example into an object graph', () => {
-    const deserializer = getDeserializer([
-      new ArticleDeserializer(),
-      new PersonDeserializer(),
-      new CommentDeserializer(),
+    const deserializer : Deserializer = getDeserializer([
+      ArticleDeserializer,
+      PersonDeserializer,
+      CommentDeserializer,
     ]);
 
     const rootItems: any[] = deserializer.consume(jsonapiOrgExampleData).getRootItems();
@@ -361,7 +346,7 @@ describe('Deserializer', () => {
   });
 
   it('deserializes a file system example into an object graph', () => {
-    const deserializer = getDeserializer([new FolderDeserializer(), new FileDeserializer()]);
+    const deserializer : Deserializer = getDeserializer([FolderDeserializer, FileDeserializer]);
 
     const rootItems: any[] = deserializer.consume(fileSystemExampleData).getRootItems();
 
@@ -369,7 +354,7 @@ describe('Deserializer', () => {
   });
 
   it('deserializes the second file system example (single entity) into an object graph', () => {
-    const deserializer = getDeserializer([new FolderDeserializer(), new FileDeserializer()]);
+    const deserializer : Deserializer = getDeserializer([FolderDeserializer, FileDeserializer]);
 
     const rootItem: Folder = deserializer.consume(fileSystemExampleData2).getRootItem();
 
