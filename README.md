@@ -31,12 +31,9 @@ type File = {
 }
 
 // Create a deserializer for the folder:
-class FolderDeserializer implements ItemDeserializer {
-    getType(): string {
-        return 'folders';
-    }
-
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const FolderDeserializer : ItemDeserializer<Folder> = {
+    type: 'folders',
+    deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Folder => {
         const folder: Folder = {
             id: parseInt(item.id),
             name: item.attributes.name,
@@ -46,16 +43,13 @@ class FolderDeserializer implements ItemDeserializer {
         folder.children = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'children');
 
         return folder;
-    }
+    },
 }
 
 // ...and also for the file:
-class FileDeserializer implements ItemDeserializer {
-    getType(): string {
-        return 'files';
-    }
-
-    deserialize(item: Item, relationshipDeserializer: RelationshipDeserializer): any {
+const FileDeserializer: ItemDeserializer<File> = {
+    type: 'files',
+    deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): File => {
         return {
             id: parseInt(item.id),
             name: item.attributes.name,
@@ -65,8 +59,8 @@ class FileDeserializer implements ItemDeserializer {
 
 // create the deserializer with the folder and file deserializers registered:
 const deserializer = getDeserializer([
-    new FolderDeserializer(),
-    new FileDeserializer(),
+    FolderDeserializer,
+    FileDeserializer,
 ]);
 
 // Fetch your JSON:API data:
@@ -85,7 +79,7 @@ const rootItems: any[] = deserializer.consume(yourJsonData).getRootItems();
 
 At least the following things are in the backlog:
 
-* [ ] Ditch the classes in the entity deserializers and use types instead
+* [X] Ditch the classes in the entity deserializers and use types instead
 * [ ] Consider caching the deserialized entities and reusing them
 * [ ] Come up with a spectacular logo for this package
 
