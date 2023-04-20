@@ -115,7 +115,7 @@ type Comment = {
   author?: Person;
 };
 
-const ArticleDeserializer : ItemDeserializer<Article> = {
+const articleDeserializer : ItemDeserializer<Article> = {
   type: 'articles',
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Article => {
     const article: Article = {
@@ -131,7 +131,7 @@ const ArticleDeserializer : ItemDeserializer<Article> = {
   }
 }
 
-const PersonDeserializer : ItemDeserializer<Person> = {
+const personDeserializer : ItemDeserializer<Person> = {
   type: 'people',
   deserialize: (item: Item, _: RelationshipDeserializer): Person => {
     return {
@@ -143,7 +143,7 @@ const PersonDeserializer : ItemDeserializer<Person> = {
   },
 }
 
-const CommentDeserializer : ItemDeserializer<Comment> = {
+const commentDeserializer : ItemDeserializer<Comment> = {
   type: 'comments',
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Comment => {
     const comment: Comment = {
@@ -307,7 +307,7 @@ type File = {
   name: string;
 };
 
-const FolderDeserializer : ItemDeserializer<Folder> = {
+const folderDeserializer : ItemDeserializer<Folder> = {
   type: 'folders',
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Folder => {
     const folder: Folder = {
@@ -322,7 +322,7 @@ const FolderDeserializer : ItemDeserializer<Folder> = {
   },
 }
 
-const FileDeserializer: ItemDeserializer<File> = {
+const fileDeserializer: ItemDeserializer<File> = {
   type: 'files',
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): File => {
     return {
@@ -335,9 +335,9 @@ const FileDeserializer: ItemDeserializer<File> = {
 describe('Deserializer', () => {
   it('deserializes the jsonapi.org example into an object graph', () => {
     const deserializer : Deserializer = getDeserializer([
-      ArticleDeserializer,
-      PersonDeserializer,
-      CommentDeserializer,
+      articleDeserializer,
+      personDeserializer,
+      commentDeserializer,
     ]);
 
     const rootItems: any[] = deserializer.consume(jsonapiOrgExampleData).getRootItems();
@@ -346,7 +346,7 @@ describe('Deserializer', () => {
   });
 
   it('deserializes a file system example into an object graph', () => {
-    const deserializer : Deserializer = getDeserializer([FolderDeserializer, FileDeserializer]);
+    const deserializer : Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
 
     const rootItems: any[] = deserializer.consume(fileSystemExampleData).getRootItems();
 
@@ -354,7 +354,7 @@ describe('Deserializer', () => {
   });
 
   it('deserializes the second file system example (single entity) into an object graph', () => {
-    const deserializer : Deserializer = getDeserializer([FolderDeserializer, FileDeserializer]);
+    const deserializer : Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
 
     const rootItem: Folder = deserializer.consume(fileSystemExampleData2).getRootItem();
 
