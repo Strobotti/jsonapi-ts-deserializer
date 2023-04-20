@@ -31,7 +31,7 @@ type File = {
 }
 
 // Create a deserializer for the folder:
-const FolderDeserializer : ItemDeserializer<Folder> = {
+const folderDeserializer : ItemDeserializer<Folder> = {
     type: 'folders',
     deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Folder => {
         const folder: Folder = {
@@ -47,7 +47,7 @@ const FolderDeserializer : ItemDeserializer<Folder> = {
 }
 
 // ...and also for the file:
-const FileDeserializer: ItemDeserializer<File> = {
+const fileDeserializer: ItemDeserializer<File> = {
     type: 'files',
     deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): File => {
         return {
@@ -59,8 +59,8 @@ const FileDeserializer: ItemDeserializer<File> = {
 
 // create the deserializer with the folder and file deserializers registered:
 const deserializer = getDeserializer([
-    FolderDeserializer,
-    FileDeserializer,
+    folderDeserializer,
+    fileDeserializer,
 ]);
 
 // Fetch your JSON:API data:
