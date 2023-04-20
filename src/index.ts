@@ -22,7 +22,7 @@ export type ItemDeserializer<T> = {
    * @param relationshipDeserializer
    */
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer) => T;
-}
+};
 
 /**
  * EntityStore contains the raw data for entities of certain type, indexed by the entity id.

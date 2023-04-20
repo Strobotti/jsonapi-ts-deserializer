@@ -115,7 +115,7 @@ type Comment = {
   author?: Person;
 };
 
-const articleDeserializer : ItemDeserializer<Article> = {
+const articleDeserializer: ItemDeserializer<Article> = {
   type: 'articles',
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Article => {
     const article: Article = {
@@ -128,10 +128,10 @@ const articleDeserializer : ItemDeserializer<Article> = {
     article.comments = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'comments');
 
     return article;
-  }
-}
+  },
+};
 
-const personDeserializer : ItemDeserializer<Person> = {
+const personDeserializer: ItemDeserializer<Person> = {
   type: 'people',
   deserialize: (item: Item, _: RelationshipDeserializer): Person => {
     return {
@@ -139,11 +139,11 @@ const personDeserializer : ItemDeserializer<Person> = {
       firstName: item.attributes.firstName,
       lastName: item.attributes.lastName,
       twitter: item.attributes.twitter,
-    }
+    };
   },
-}
+};
 
-const commentDeserializer : ItemDeserializer<Comment> = {
+const commentDeserializer: ItemDeserializer<Comment> = {
   type: 'comments',
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Comment => {
     const comment: Comment = {
@@ -154,8 +154,8 @@ const commentDeserializer : ItemDeserializer<Comment> = {
     comment.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
 
     return comment;
-  }
-}
+  },
+};
 
 // a JSON:API response with a simple directory structure with a couple of files and folders
 const fileSystemExampleData = {
@@ -307,7 +307,7 @@ type File = {
   name: string;
 };
 
-const folderDeserializer : ItemDeserializer<Folder> = {
+const folderDeserializer: ItemDeserializer<Folder> = {
   type: 'folders',
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Folder => {
     const folder: Folder = {
@@ -320,7 +320,7 @@ const folderDeserializer : ItemDeserializer<Folder> = {
 
     return folder;
   },
-}
+};
 
 const fileDeserializer: ItemDeserializer<File> = {
   type: 'files',
@@ -329,16 +329,12 @@ const fileDeserializer: ItemDeserializer<File> = {
       id: parseInt(item.id),
       name: item.attributes.name,
     };
-  }
-}
+  },
+};
 
 describe('Deserializer', () => {
   it('deserializes the jsonapi.org example into an object graph', () => {
-    const deserializer : Deserializer = getDeserializer([
-      articleDeserializer,
-      personDeserializer,
-      commentDeserializer,
-    ]);
+    const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer]);
 
     const rootItems: any[] = deserializer.consume(jsonapiOrgExampleData).getRootItems();
 
@@ -346,7 +342,7 @@ describe('Deserializer', () => {
   });
 
   it('deserializes a file system example into an object graph', () => {
-    const deserializer : Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
+    const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
 
     const rootItems: any[] = deserializer.consume(fileSystemExampleData).getRootItems();
 
@@ -354,7 +350,7 @@ describe('Deserializer', () => {
   });
 
   it('deserializes the second file system example (single entity) into an object graph', () => {
-    const deserializer : Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
+    const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
 
     const rootItem: Folder = deserializer.consume(fileSystemExampleData2).getRootItem();
 

@@ -1,3 +1,17 @@
+# [2.0.0](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v1.1.3...v2.0.0) (2023-04-20)
+
+
+### Features
+
+* use types instead of classes with ItemDeserializer ([d31748b](https://github.com/Strobotti/jsonapi-ts-deserializer/commit/d31748b354eaadd87f1dffe75791643b97205a70))
+
+
+### BREAKING CHANGES
+
+* ItemDeserializer is now a type and not an interface
+
+The ItemSerializer needs to be implemented by having a type that contains the "type" and "deserialize" also supporting generics with the deserialize return value. See the updated documentation on README.md for details.
+
 ## [1.1.3](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v1.1.2...v1.1.3) (2023-03-28)
 
 
