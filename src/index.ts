@@ -1,13 +1,46 @@
+export type RelationshipItem = {
+  id: string,
+  type: string,
+  meta?: {
+    [key: string]: unknown
+  }
+}
+
 /**
  * Item is an object that contains the raw data for a single entity in "data" or "included" sections of the JSON:API response.
  */
 export type Item = {
   id: string;
   type: string;
-  attributes: any;
-  relationships?: any;
-  meta?: any;
+  attributes: {
+    [key: string]: any
+  };
+  relationships?: {
+    [key: string]: {
+      links?: {
+        [key: string]: any
+      },
+      data?: RelationshipItem | RelationshipItem[] | null
+    }
+  };
+  meta?: {
+    [key: string]: any
+  };
+  links?: {
+    [key: string]: any
+  }
 };
+
+export type JsonPayload = {
+  data: Item | Item[],
+  included?: Item[]
+  meta?: {
+    [key: string]: any
+  },
+  links?: {
+    [key: string]: any
+  }
+}
 
 export type ItemDeserializer<T> = {
   /**
@@ -97,9 +130,15 @@ export class Deserializer implements RelationshipDeserializer {
    * @param name
    */
   public deserializeRelationship(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any {
-    if (!item?.relationships || !item.relationships[name]) return null;
+    if (!item?.relationships || !item.relationships[name] || !item.relationships[name]?.data) return null;
 
-    const relationship = item.relationships[name]?.data;
+    const relationships: RelationshipItem|RelationshipItem[]|null|undefined = item.relationships[name]?.data
+    if (!relationships) return null;
+    if (Array.isArray(relationships)) {
+      throw new Error(`Relationship "${name}" is an array, use deserializeRelationships instead.`);
+    }
+
+    const relationship: RelationshipItem = relationships as RelationshipItem
 
     if (!relationship) return null;
 
@@ -128,7 +167,11 @@ export class Deserializer implements RelationshipDeserializer {
 
     const ret: any[] = [];
 
-    item.relationships[name].data?.forEach((relationship: any) => {
+    const relationshipItems = item.relationships[name].data;
+
+    if (!Array.isArray(relationshipItems)) return ret;
+
+    relationshipItems.forEach((relationship: RelationshipItem) => {
       let relationshipItem: Item;
 
       try {
@@ -167,7 +210,7 @@ export class Deserializer implements RelationshipDeserializer {
   /**
    * @param json The "raw" json object from JSON:API response; must contain key "data"
    */
-  public consume(json: { data?: any; included?: any }): Deserializer {
+  public consume(json: JsonPayload): Deserializer {
     if (!json.data) {
       throw new Error('JSON-object must contain key `data`');
     }

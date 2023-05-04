@@ -122,7 +122,7 @@ const jsonapiOrgExampleData2 = {
             self: 'https://example.com/articles/1/relationships/comments',
             related: 'https://example.com/articles/1/comments',
           },
-          data: null,
+          data: [],
         },
       },
       links: {
@@ -347,7 +347,7 @@ const fileSystemExampleData3 = {
           related: 'https://example.com/folders/1/children',
           self: 'https://example.com/folders/1/relationships/children',
         },
-        data: null,
+        data: [],
       },
     },
   },
