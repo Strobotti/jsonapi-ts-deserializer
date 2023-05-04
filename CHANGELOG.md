@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v2.0.0...v2.0.1) (2023-05-04)
+
+
+### Bug Fixes
+
+* crash when data is null for a relationship ([68e06e6](https://github.com/Strobotti/jsonapi-ts-deserializer/commit/68e06e636d6a63c1c40fa8b075cd2e4525005848))
+
 # [2.0.0](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v1.1.3...v2.0.0) (2023-04-20)
 
 

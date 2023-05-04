@@ -130,7 +130,7 @@ const jsonapiOrgExampleData2 = {
       },
     },
   ],
-}
+};
 
 type Article = {
   id: number;
@@ -345,12 +345,12 @@ const fileSystemExampleData3 = {
       children: {
         links: {
           related: 'https://example.com/folders/1/children',
-          self: 'https://example.com/folders/1/relationships/children'
+          self: 'https://example.com/folders/1/relationships/children',
         },
         data: null,
       },
     },
-  }
+  },
 };
 
 type Folder = {
