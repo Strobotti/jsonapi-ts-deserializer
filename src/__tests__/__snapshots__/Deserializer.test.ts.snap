@@ -94,3 +94,22 @@ exports[`Deserializer deserializes the second file system example (single entity
   "name": "root",
 }
 `;
+
+exports[`Deserializer deserializes the second jsonapi.org example (without relationships but with relationships.*.links and data:null) into an object graph 1`] = `
+[
+  {
+    "author": null,
+    "comments": [],
+    "id": 1,
+    "title": "JSON:API paints my bikeshed!",
+  },
+]
+`;
+
+exports[`Deserializer deserializes the third file system example (single entity with relationships.children.links) into an object graph 1`] = `
+{
+  "children": [],
+  "id": 1,
+  "name": "root",
+}
+`;

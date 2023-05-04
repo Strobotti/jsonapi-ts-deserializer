@@ -99,7 +99,10 @@ export class Deserializer implements RelationshipDeserializer {
   public deserializeRelationship(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any {
     if (!item?.relationships || !item.relationships[name]) return null;
 
-    const relationship = item.relationships[name].data;
+    const relationship = item.relationships[name]?.data;
+
+    if (!relationship) return null;
+
     let relationshipItem: Item;
 
     try {
@@ -125,7 +128,7 @@ export class Deserializer implements RelationshipDeserializer {
 
     const ret: any[] = [];
 
-    item.relationships[name].data.forEach((relationship: any) => {
+    item.relationships[name].data?.forEach((relationship: any) => {
       let relationshipItem: Item;
 
       try {

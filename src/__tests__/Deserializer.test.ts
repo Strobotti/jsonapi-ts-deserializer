@@ -2,9 +2,9 @@ import { Deserializer, getDeserializer, Item, ItemDeserializer, RelationshipDese
 
 const jsonapiOrgExampleData = {
   links: {
-    self: 'http://example.com/articles',
-    next: 'http://example.com/articles?page[offset]=2',
-    last: 'http://example.com/articles?page[offset]=10',
+    self: 'https://example.com/articles',
+    next: 'https://example.com/articles?page[offset]=2',
+    last: 'https://example.com/articles?page[offset]=10',
   },
   data: [
     {
@@ -16,15 +16,15 @@ const jsonapiOrgExampleData = {
       relationships: {
         author: {
           links: {
-            self: 'http://example.com/articles/1/relationships/author',
-            related: 'http://example.com/articles/1/author',
+            self: 'https://example.com/articles/1/relationships/author',
+            related: 'https://example.com/articles/1/author',
           },
           data: { type: 'people', id: '9' },
         },
         comments: {
           links: {
-            self: 'http://example.com/articles/1/relationships/comments',
-            related: 'http://example.com/articles/1/comments',
+            self: 'https://example.com/articles/1/relationships/comments',
+            related: 'https://example.com/articles/1/comments',
           },
           data: [
             { type: 'comments', id: '5' },
@@ -33,7 +33,7 @@ const jsonapiOrgExampleData = {
         },
       },
       links: {
-        self: 'http://example.com/articles/1',
+        self: 'https://example.com/articles/1',
       },
     },
   ],
@@ -47,7 +47,7 @@ const jsonapiOrgExampleData = {
         twitter: 'dgeb',
       },
       links: {
-        self: 'http://example.com/people/9',
+        self: 'https://example.com/people/9',
       },
     },
     {
@@ -59,7 +59,7 @@ const jsonapiOrgExampleData = {
         twitter: 'jdoe',
       },
       links: {
-        self: 'http://example.com/people/2',
+        self: 'https://example.com/people/2',
       },
     },
     {
@@ -74,7 +74,7 @@ const jsonapiOrgExampleData = {
         },
       },
       links: {
-        self: 'http://example.com/comments/5',
+        self: 'https://example.com/comments/5',
       },
     },
     {
@@ -89,11 +89,48 @@ const jsonapiOrgExampleData = {
         },
       },
       links: {
-        self: 'http://example.com/comments/12',
+        self: 'https://example.com/comments/12',
       },
     },
   ],
 };
+
+// In this case we have requested just the articles without the included people and comments, but the links to the related resources are still there.
+const jsonapiOrgExampleData2 = {
+  links: {
+    self: 'https://example.com/articles',
+    next: 'https://example.com/articles?page[offset]=2',
+    last: 'https://example.com/articles?page[offset]=10',
+  },
+  data: [
+    {
+      type: 'articles',
+      id: '1',
+      attributes: {
+        title: 'JSON:API paints my bikeshed!',
+      },
+      relationships: {
+        author: {
+          links: {
+            self: 'https://example.com/articles/1/relationships/author',
+            related: 'https://example.com/articles/1/author',
+          },
+          data: null,
+        },
+        comments: {
+          links: {
+            self: 'https://example.com/articles/1/relationships/comments',
+            related: 'https://example.com/articles/1/comments',
+          },
+          data: null,
+        },
+      },
+      links: {
+        self: 'https://example.com/articles/1',
+      },
+    },
+  ],
+}
 
 type Article = {
   id: number;
@@ -296,6 +333,26 @@ const fileSystemExampleData2 = {
   ],
 };
 
+// In this case we have requested just the root folder, so the children relationship is null but the relationships object is still present and populated with the links object.
+const fileSystemExampleData3 = {
+  data: {
+    type: 'folders',
+    id: '1',
+    attributes: {
+      name: 'root',
+    },
+    relationships: {
+      children: {
+        links: {
+          related: 'https://example.com/folders/1/children',
+          self: 'https://example.com/folders/1/relationships/children'
+        },
+        data: null,
+      },
+    },
+  }
+};
+
 type Folder = {
   id: number;
   name: string;
@@ -341,6 +398,14 @@ describe('Deserializer', () => {
     expect(rootItems).toMatchSnapshot();
   });
 
+  it('deserializes the second jsonapi.org example (without relationships but with relationships.*.links and data:null) into an object graph', () => {
+    const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer]);
+
+    const rootItems: any[] = deserializer.consume(jsonapiOrgExampleData2).getRootItems();
+
+    expect(rootItems).toMatchSnapshot();
+  });
+
   it('deserializes a file system example into an object graph', () => {
     const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
 
@@ -353,6 +418,14 @@ describe('Deserializer', () => {
     const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
 
     const rootItem: Folder = deserializer.consume(fileSystemExampleData2).getRootItem();
+
+    expect(rootItem).toMatchSnapshot();
+  });
+
+  it('deserializes the third file system example (single entity with relationships.children.links) into an object graph', () => {
+    const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
+
+    const rootItem: Folder = deserializer.consume(fileSystemExampleData3).getRootItem();
 
     expect(rootItem).toMatchSnapshot();
   });
