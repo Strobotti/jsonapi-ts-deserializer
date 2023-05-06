@@ -70,6 +70,9 @@ const yourJsonData = fetch('https://api.example.com/api/folders');
 const rootItems: any[] = deserializer.consume(yourJsonData).getRootItems();
 ```
 
+Please note that the deserializer only supports successful responses, and you will get an error if the response is not compatible with the JSON:API specification.
+I practise the response should be checked for errors before deserializing it and the error handling should be done separately.
+
 ### Examples
 
 * [The JSON from the jsonapi.org example](docs/examples/jsonapiorg)

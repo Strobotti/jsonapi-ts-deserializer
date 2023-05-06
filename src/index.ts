@@ -1,4 +1,7 @@
-export type RelationshipItem = {
+/**
+ * RelationshipItem is an object that contains the link to a related entity in the "data" section of the JSON:API response.
+ */
+type RelationshipItem = {
   id: string,
   type: string,
   meta?: {
@@ -31,7 +34,10 @@ export type Item = {
   }
 };
 
-export type JsonPayload = {
+/**
+ * JsonApiPayload is the JSON:API response payload.
+ */
+type JsonApiPayload = {
   data: Item | Item[],
   included?: Item[]
   meta?: {
@@ -189,7 +195,7 @@ export class Deserializer implements RelationshipDeserializer {
   }
 
   private getItemByTypeAndId(type: string, id: string): Item {
-    const item = this.entityStoreCollection[type][id];
+    const item: Item = this.entityStoreCollection[type][id];
 
     if (!item) {
       throw new Error(`Entity {id: "${id}", type: "${type}"} not found.`);
@@ -199,7 +205,7 @@ export class Deserializer implements RelationshipDeserializer {
   }
 
   private getDeserializerForType(type: string): ItemDeserializer<any> {
-    const deserializer = this.itemDeserializerRegistry[type];
+    const deserializer: ItemDeserializer<any> = this.itemDeserializerRegistry[type];
     if (!deserializer) {
       throw new Error(`An ItemDeserializer for type ${type} is not registered.`);
     }
@@ -210,7 +216,7 @@ export class Deserializer implements RelationshipDeserializer {
   /**
    * @param json The "raw" json object from JSON:API response; must contain key "data"
    */
-  public consume(json: JsonPayload): Deserializer {
+  public consume(json: JsonApiPayload): Deserializer {
     if (!json.data) {
       throw new Error('JSON-object must contain key `data`');
     }
