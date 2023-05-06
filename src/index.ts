@@ -76,7 +76,17 @@ type EntityStoreCollection = { [key: string]: EntityStore };
 type ItemDeserializerRegistry = { [key: string]: ItemDeserializer<any> };
 
 export interface RelationshipDeserializer {
+  /**
+   * Returns whether the data for given entity type and id exists in the JSON:API response.
+   *
+   * Sometimes the JSON:API response contains a relationship to an entity that is not included in the "included" section of the response.
+   * If this is the case, the relationshipDeserializer will not be able to deserialize the relationship but will throw an error. To mitigate
+   * this, you can check if the data exists before deserializing the relationship.
+   */
+  isIncluded(id: string, type: string): boolean;
+
   deserializeRelationship(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any;
+
   deserializeRelationships(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any[];
 }
 
@@ -126,6 +136,17 @@ export class Deserializer implements RelationshipDeserializer {
     });
 
     return items;
+  }
+
+  public isIncluded(type: string, id: string): boolean {
+    try {
+      // TODO:
+      //  - reuse code: good
+      //  - use try-catching: bad
+      return !!this.getItemByTypeAndId(type, id);
+    } catch (e) {
+      return false;
+    }
   }
 
   /**
