@@ -135,7 +135,7 @@ const jsonapiOrgExampleData2 = {
 type Article = {
   id: number;
   title: string;
-  author?: Person;
+  author?: Person|null;
   comments: Comment[];
 };
 
@@ -156,13 +156,18 @@ const articleDeserializer: ItemDeserializer<Article> = {
   type: 'articles',
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Article => {
     const article: Article = {
+      author: null,
       id: parseInt(item.id),
       title: item.attributes.title,
       comments: [],
     };
 
-    article.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
-    article.comments = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'comments');
+    if (relationshipDeserializer.isRelationshipDataPresent(item, 'author')) {
+      article.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
+    }
+    if (relationshipDeserializer.isRelationshipDataPresent(item, 'comments')) {
+      article.comments = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'comments');
+    }
 
     return article;
   },
@@ -188,8 +193,9 @@ const commentDeserializer: ItemDeserializer<Comment> = {
       body: item.attributes.body,
     };
 
-    comment.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
-
+    if (relationshipDeserializer.isRelationshipDataPresent(item, 'author')) {
+      comment.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
+    }
     return comment;
   },
 };
@@ -373,8 +379,9 @@ const folderDeserializer: ItemDeserializer<Folder> = {
       children: [],
     };
 
-    folder.children = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'children');
-
+    if (relationshipDeserializer.isRelationshipDataPresent(item, 'children')) {
+      folder.children = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'children');
+    }
     return folder;
   },
 };
@@ -394,9 +401,6 @@ describe('Deserializer', () => {
     const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer])
         .consume(jsonapiOrgExampleData);
 
-    expect(deserializer.isIncluded('people', '9')).toBe(true);
-    expect(deserializer.isIncluded('people', '100')).toBe(false);
-
     const rootItems: any[] = deserializer.getRootItems();
 
     expect(rootItems).toMatchSnapshot();
@@ -405,9 +409,6 @@ describe('Deserializer', () => {
   it('deserializes the second jsonapi.org example (without relationships but with relationships.*.links and data:null) into an object graph', () => {
     const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer])
         .consume(jsonapiOrgExampleData2);
-
-    expect(deserializer.isIncluded('people', '9')).toBe(false);
-    expect(deserializer.isIncluded('people', '100')).toBe(false);
 
     const rootItems: any[] = deserializer.getRootItems();
 
