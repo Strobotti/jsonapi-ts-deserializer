@@ -163,10 +163,10 @@ const articleDeserializer: ItemDeserializer<Article> = {
     };
 
     if (relationshipDeserializer.isRelationshipDataPresent(item, 'author')) {
-      article.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
+      article.author = relationshipDeserializer.deserializeRelationship(item, 'author');
     }
     if (relationshipDeserializer.isRelationshipDataPresent(item, 'comments')) {
-      article.comments = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'comments');
+      article.comments = relationshipDeserializer.deserializeRelationships(item, 'comments');
     }
 
     return article;
@@ -194,7 +194,7 @@ const commentDeserializer: ItemDeserializer<Comment> = {
     };
 
     if (relationshipDeserializer.isRelationshipDataPresent(item, 'author')) {
-      comment.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
+      comment.author = relationshipDeserializer.deserializeRelationship(item, 'author');
     }
     return comment;
   },
@@ -380,7 +380,7 @@ const folderDeserializer: ItemDeserializer<Folder> = {
     };
 
     if (relationshipDeserializer.isRelationshipDataPresent(item, 'children')) {
-      folder.children = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'children');
+      folder.children = relationshipDeserializer.deserializeRelationships(item, 'children');
     }
     return folder;
   },

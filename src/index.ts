@@ -85,9 +85,9 @@ export interface RelationshipDeserializer {
      */
     isRelationshipDataPresent(item: Item, name: string): boolean;
 
-    deserializeRelationship(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any;
+    deserializeRelationship(item: Item, name: string): any;
 
-    deserializeRelationships(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any[];
+    deserializeRelationships(item: Item, name: string): any[];
 }
 
 export class Deserializer implements RelationshipDeserializer {
@@ -164,11 +164,10 @@ export class Deserializer implements RelationshipDeserializer {
     /**
      * Parses and wires the relationship with the given name for the given item.
      *
-     * @param relationshipDeserializer
      * @param item
      * @param name
      */
-    public deserializeRelationship(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any {
+    public deserializeRelationship(item: Item, name: string): any {
         if (!item?.relationships || !item.relationships[name] || !item.relationships[name]?.data) return null;
 
         const relationships: RelationshipItem | RelationshipItem[] | null | undefined = item.relationships[name]?.data
@@ -197,11 +196,10 @@ export class Deserializer implements RelationshipDeserializer {
     /**
      * Parses and wires the relationships with the given name for the given item. Returns an array of deserialized items.
      *
-     * @param relationshipDeserializer
      * @param item
      * @param name
      */
-    public deserializeRelationships(relationshipDeserializer: RelationshipDeserializer, item: Item, name: string): any[] {
+    public deserializeRelationships(item: Item, name: string): any[] {
         if (!item?.relationships || !item.relationships[name]) return [];
 
         const ret: any[] = [];
