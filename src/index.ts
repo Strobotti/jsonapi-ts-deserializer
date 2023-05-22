@@ -213,7 +213,7 @@ export class Deserializer implements RelationshipDeserializer {
     }
 
     private getItemByTypeAndId(type: string, id: string): Item|null {
-        if (!this.entityStoreCollection[type]) {
+        if (!this.entityStoreCollection.hasOwnProperty(type)) {
             return null
         }
         const item: Item = this.entityStoreCollection[type][id];
