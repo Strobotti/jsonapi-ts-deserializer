@@ -122,7 +122,7 @@ const jsonapiOrgExampleData2 = {
             self: 'https://example.com/articles/1/relationships/comments',
             related: 'https://example.com/articles/1/comments',
           },
-          data: null,
+          data: [],
         },
       },
       links: {
@@ -135,7 +135,7 @@ const jsonapiOrgExampleData2 = {
 type Article = {
   id: number;
   title: string;
-  author?: Person;
+  author?: Person|null;
   comments: Comment[];
 };
 
@@ -156,13 +156,18 @@ const articleDeserializer: ItemDeserializer<Article> = {
   type: 'articles',
   deserialize: (item: Item, relationshipDeserializer: RelationshipDeserializer): Article => {
     const article: Article = {
+      author: null,
       id: parseInt(item.id),
       title: item.attributes.title,
       comments: [],
     };
 
-    article.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
-    article.comments = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'comments');
+    if (relationshipDeserializer.isRelationshipDataPresent(item, 'author')) {
+      article.author = relationshipDeserializer.deserializeRelationship(item, 'author');
+    }
+    if (relationshipDeserializer.isRelationshipDataPresent(item, 'comments')) {
+      article.comments = relationshipDeserializer.deserializeRelationships(item, 'comments');
+    }
 
     return article;
   },
@@ -188,8 +193,9 @@ const commentDeserializer: ItemDeserializer<Comment> = {
       body: item.attributes.body,
     };
 
-    comment.author = relationshipDeserializer.deserializeRelationship(relationshipDeserializer, item, 'author');
-
+    if (relationshipDeserializer.isRelationshipDataPresent(item, 'author')) {
+      comment.author = relationshipDeserializer.deserializeRelationship(item, 'author');
+    }
     return comment;
   },
 };
@@ -347,7 +353,7 @@ const fileSystemExampleData3 = {
           related: 'https://example.com/folders/1/children',
           self: 'https://example.com/folders/1/relationships/children',
         },
-        data: null,
+        data: [],
       },
     },
   },
@@ -373,8 +379,9 @@ const folderDeserializer: ItemDeserializer<Folder> = {
       children: [],
     };
 
-    folder.children = relationshipDeserializer.deserializeRelationships(relationshipDeserializer, item, 'children');
-
+    if (relationshipDeserializer.isRelationshipDataPresent(item, 'children')) {
+      folder.children = relationshipDeserializer.deserializeRelationships(item, 'children');
+    }
     return folder;
   },
 };
@@ -391,17 +398,19 @@ const fileDeserializer: ItemDeserializer<File> = {
 
 describe('Deserializer', () => {
   it('deserializes the jsonapi.org example into an object graph', () => {
-    const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer]);
+    const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer])
+        .consume(jsonapiOrgExampleData);
 
-    const rootItems: any[] = deserializer.consume(jsonapiOrgExampleData).getRootItems();
+    const rootItems: any[] = deserializer.getRootItems();
 
     expect(rootItems).toMatchSnapshot();
   });
 
   it('deserializes the second jsonapi.org example (without relationships but with relationships.*.links and data:null) into an object graph', () => {
-    const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer]);
+    const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer])
+        .consume(jsonapiOrgExampleData2);
 
-    const rootItems: any[] = deserializer.consume(jsonapiOrgExampleData2).getRootItems();
+    const rootItems: any[] = deserializer.getRootItems();
 
     expect(rootItems).toMatchSnapshot();
   });
