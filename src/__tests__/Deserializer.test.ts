@@ -135,7 +135,7 @@ const jsonapiOrgExampleData2 = {
 type Article = {
   id: number;
   title: string;
-  author?: Person|null;
+  author?: Person | null;
   comments: Comment[];
 };
 
@@ -398,8 +398,11 @@ const fileDeserializer: ItemDeserializer<File> = {
 
 describe('Deserializer', () => {
   it('deserializes the jsonapi.org example into an object graph', () => {
-    const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer])
-        .consume(jsonapiOrgExampleData);
+    const deserializer: Deserializer = getDeserializer([
+      articleDeserializer,
+      personDeserializer,
+      commentDeserializer,
+    ]).consume(jsonapiOrgExampleData);
 
     const rootItems: any[] = deserializer.getRootItems();
 
@@ -407,8 +410,11 @@ describe('Deserializer', () => {
   });
 
   it('deserializes the second jsonapi.org example (without relationships but with relationships.*.links and data:null) into an object graph', () => {
-    const deserializer: Deserializer = getDeserializer([articleDeserializer, personDeserializer, commentDeserializer])
-        .consume(jsonapiOrgExampleData2);
+    const deserializer: Deserializer = getDeserializer([
+      articleDeserializer,
+      personDeserializer,
+      commentDeserializer,
+    ]).consume(jsonapiOrgExampleData2);
 
     const rootItems: any[] = deserializer.getRootItems();
 
