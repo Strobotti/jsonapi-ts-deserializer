@@ -180,15 +180,8 @@ export class Deserializer implements RelationshipDeserializer {
 
         if (!relationship) return null;
 
-        let relationshipItem: Item;
-
-        try {
-            relationshipItem = this.getItemByTypeAndId(relationship.type, relationship.id);
-        } catch (e) {
-            throw new Error(
-                `Failed to fetch relationship "${name}" for entity {id: "${item.id}", type: "${item.type}"}: ${e}`,
-            );
-        }
+        const relationshipItem = this.getItemByTypeAndId(relationship.type, relationship.id);
+        if (!relationshipItem) return null;
 
         return this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this);
     }
@@ -209,15 +202,9 @@ export class Deserializer implements RelationshipDeserializer {
         if (!Array.isArray(relationshipItems)) return ret;
 
         relationshipItems.forEach((relationship: RelationshipItem) => {
-            let relationshipItem: Item;
+            const relationshipItem = this.getItemByTypeAndId(relationship.type, relationship.id);
 
-            try {
-                relationshipItem = this.getItemByTypeAndId(relationship.type, relationship.id);
-            } catch (e) {
-                throw new Error(
-                    `Failed to fetch relationship "${name}" for entity {id: "${item.id}", type: "${item.type}"}: ${e}`,
-                );
-            }
+            if (!relationshipItem) return;
 
             ret.push(this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this));
         });
@@ -225,11 +212,14 @@ export class Deserializer implements RelationshipDeserializer {
         return ret;
     }
 
-    private getItemByTypeAndId(type: string, id: string): Item {
+    private getItemByTypeAndId(type: string, id: string): Item|null {
+        if (!this.entityStoreCollection[type]) {
+            return null
+        }
         const item: Item = this.entityStoreCollection[type][id];
 
         if (!item) {
-            throw new Error(`Entity {id: "${id}", type: "${type}"} not found.`);
+            return null
         }
 
         return item;
