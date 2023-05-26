@@ -8,7 +8,7 @@
     "test": "jest --config jestconfig.json",
     "coverage": "jest --config jestconfig.json --coverage --coverageReporters=\"json-summary\"",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint .",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "build": "tsc",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",

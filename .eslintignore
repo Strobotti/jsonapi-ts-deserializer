@@ -1,5 +1,1 @@
-*.test.ts
-/lib
-/docs
-/coverage
-/.eslintrc.js
+*.spec.ts
