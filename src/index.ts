@@ -146,14 +146,14 @@ export class Deserializer implements RelationshipDeserializer {
     const relationShips = item?.relationships[name];
 
     if (Array.isArray(relationShips?.data)) {
-      const relationships: RelationshipItem[] = relationShips.data as RelationshipItem[];
+      const relationships: RelationshipItem[] = relationShips.data;
       return relationships.every((relationship) => {
         return !!this.getItemByTypeAndId(relationship.type, relationship.id);
       });
     }
 
     if (relationShips?.data?.id && relationShips?.data?.type) {
-      const relationship: RelationshipItem = relationShips.data as RelationshipItem;
+      const relationship: RelationshipItem = relationShips.data;
 
       return !!this.getItemByTypeAndId(relationship.type, relationship.id);
     }
@@ -176,7 +176,7 @@ export class Deserializer implements RelationshipDeserializer {
       throw new Error(`Relationship "${name}" is an array, use deserializeRelationships instead.`);
     }
 
-    const relationship: RelationshipItem = relationships as RelationshipItem;
+    const relationship: RelationshipItem = relationships;
 
     if (!relationship) return null;
 
@@ -267,7 +267,7 @@ export class Deserializer implements RelationshipDeserializer {
 /**
  * Returns a Deserializer with the given ItemDeserializers registered.
  */
-export function getDeserializer(itemDeserializers: ItemDeserializer<any>[]): Deserializer {
+export const getDeserializer = (itemDeserializers: ItemDeserializer<any>[]): Deserializer => {
   const deserializer: Deserializer = new Deserializer();
 
   itemDeserializers.forEach((itemDeserializer: ItemDeserializer<any>) => {
@@ -275,4 +275,4 @@ export function getDeserializer(itemDeserializers: ItemDeserializer<any>[]): Des
   });
 
   return deserializer;
-}
+};
