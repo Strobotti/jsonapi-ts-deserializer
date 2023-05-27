@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v2.1.0...v2.2.0) (2023-05-27)
+
+
+### Features
+
+* migrate from tslint to eslint ([#6](https://github.com/Strobotti/jsonapi-ts-deserializer/issues/6)) ([9fff9a5](https://github.com/Strobotti/jsonapi-ts-deserializer/commit/9fff9a545f2b6c5702303ca687ef84438754db91))
+
 # [2.1.0](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v2.0.1...v2.1.0) (2023-05-22)
 
 
