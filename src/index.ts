@@ -21,7 +21,7 @@ export type Item = {
   relationships?: {
     [key: string]: {
       links?: {
-        [key: string]: any;
+        [key: string]: string | null;
       };
       data?: RelationshipItem | RelationshipItem[] | null;
     };
@@ -30,7 +30,7 @@ export type Item = {
     [key: string]: any;
   };
   links?: {
-    [key: string]: any;
+    [key: string]: string | null;
   };
 };
 
@@ -44,7 +44,7 @@ type JsonApiPayload = {
     [key: string]: any;
   };
   links?: {
-    [key: string]: any;
+    [key: string]: string | null;
   };
 };
 
