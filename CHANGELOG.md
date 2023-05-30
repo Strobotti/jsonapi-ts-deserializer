@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v2.2.0...v2.3.0) (2023-05-30)
+
+
+### Features
+
+* have stricter type-checks ([#7](https://github.com/Strobotti/jsonapi-ts-deserializer/issues/7)) ([962b7f5](https://github.com/Strobotti/jsonapi-ts-deserializer/commit/962b7f54c3deec574ef58658a1412c6f0d86b6c2))
+
 # [2.2.0](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v2.1.0...v2.2.0) (2023-05-27)
 
 
