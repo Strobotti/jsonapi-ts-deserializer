@@ -380,7 +380,7 @@ const fileSystemExampleData4 = {
           {
             type: 'really-big-files',
             id: '7',
-          }
+          },
         ],
       },
     },
@@ -445,7 +445,7 @@ const fileSystemExampleData4 = {
       attributes: {
         name: 'should not be deserialized',
       },
-    }
+    },
   ],
 };
 
@@ -471,7 +471,7 @@ const fileSystemExampleData5 = {
             {
               type: 'really-big-files',
               id: '7',
-            }
+            },
           ],
         },
       },
@@ -544,7 +544,7 @@ const fileSystemExampleData5 = {
       attributes: {
         name: 'should not be deserialized',
       },
-    }
+    },
   ],
 };
 type Folder = {
@@ -636,12 +636,14 @@ describe('Deserializer', () => {
   it('throws an error when serializer is not found for entity', () => {
     const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
 
-    expect(() => deserializer.consume(fileSystemExampleData4).getRootItem()).toThrow()
+    expect(() => deserializer.consume(fileSystemExampleData4).getRootItem()).toThrow();
   });
 
   describe('skipUnkownEntities = true', () => {
     it('does not throw an error when serializer is not found for entity and save the unknown entity type when deserializing object', () => {
-      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], { skipUnknownEntities: true });
+      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], {
+        skipUnknownEntities: true,
+      });
 
       const rootItem: Folder = deserializer.consume(fileSystemExampleData4).getRootItem();
 
@@ -649,11 +651,13 @@ describe('Deserializer', () => {
 
       expect(deserializer.getSkippedEntities()).toEqual(['hidden-files', 'really-big-files']);
 
-      expect(JSON.stringify(rootItem)).not.toContain('should not be deserialized')
+      expect(JSON.stringify(rootItem)).not.toContain('should not be deserialized');
     });
 
     it('does not throw an error when serializer is not found for entity and save the unknown entity type when deserializing array', () => {
-      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], { skipUnknownEntities: true });
+      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], {
+        skipUnknownEntities: true,
+      });
 
       const rootItem: Folder[] = deserializer.consume(fileSystemExampleData5).getRootItems();
 
@@ -661,11 +665,13 @@ describe('Deserializer', () => {
 
       expect(deserializer.getSkippedEntities()).toEqual(['hidden-files', 'really-big-files', 'unknown-folders']);
 
-      expect(JSON.stringify(rootItem)).not.toContain('should not be deserialized')
+      expect(JSON.stringify(rootItem)).not.toContain('should not be deserialized');
     });
 
     it('clears saved unknown entities on another call to getRootItem()', () => {
-      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], { skipUnknownEntities: true });
+      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], {
+        skipUnknownEntities: true,
+      });
 
       deserializer.consume(fileSystemExampleData4).getRootItem();
 
@@ -677,7 +683,9 @@ describe('Deserializer', () => {
     });
 
     it('clears saved unknown entities on another call to getRootItems()', () => {
-      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], { skipUnknownEntities: true });
+      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], {
+        skipUnknownEntities: true,
+      });
 
       deserializer.consume(fileSystemExampleData5).getRootItems();
 
@@ -687,5 +695,5 @@ describe('Deserializer', () => {
 
       expect(deserializer.getSkippedEntities()).toEqual([]);
     });
-  })
+  });
 });

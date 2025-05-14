@@ -77,7 +77,7 @@ type ItemDeserializerRegistry = { [key: string]: ItemDeserializer<any> };
 
 interface DeserializerOptions {
   /**
-   * If true, the deserializer will skip unknown entities (entities that do not have a registered ItemDeserializer). 
+   * If true, the deserializer will skip unknown entities (entities that do not have a registered ItemDeserializer).
    * Otherwise the deserializer will throw an error if it encounters an unknown entity.
    */
   skipUnknownEntities?: boolean;
@@ -105,9 +105,7 @@ export class Deserializer implements RelationshipDeserializer {
   private skipUnknownEntities = false;
   private skippedEntities: string[] = [];
 
-  constructor({
-    skipUnknownEntities = false,
-  }: DeserializerOptions = {}) {
+  constructor({ skipUnknownEntities = false }: DeserializerOptions = {}) {
     this.skipUnknownEntities = skipUnknownEntities;
   }
 
@@ -142,8 +140,8 @@ export class Deserializer implements RelationshipDeserializer {
 
     this.skippedEntities = [];
 
-    const deserializer = this.getDeserializerForType(type)
-    
+    const deserializer = this.getDeserializerForType(type);
+
     if (!deserializer) {
       return null;
     }
@@ -167,7 +165,7 @@ export class Deserializer implements RelationshipDeserializer {
       const item = this.rootItems[id];
       const type = item.type;
 
-      const deserializer = this.getDeserializerForType(type)
+      const deserializer = this.getDeserializerForType(type);
 
       if (!deserializer) {
         return;
@@ -285,7 +283,7 @@ export class Deserializer implements RelationshipDeserializer {
         this.skippedEntities.push(type);
 
         return null;
-      } 
+      }
 
       throw new Error(`An ItemDeserializer for type ${type} is not registered.`);
     }
@@ -333,7 +331,10 @@ export class Deserializer implements RelationshipDeserializer {
 /**
  * Returns a Deserializer with the given ItemDeserializers registered.
  */
-export const getDeserializer = (itemDeserializers: ItemDeserializer<any>[], options: DeserializerOptions = {}): Deserializer => {
+export const getDeserializer = (
+  itemDeserializers: ItemDeserializer<any>[],
+  options: DeserializerOptions = {},
+): Deserializer => {
   const deserializer: Deserializer = new Deserializer(options);
 
   itemDeserializers.forEach((itemDeserializer: ItemDeserializer<any>) => {

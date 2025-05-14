@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v2.4.0...v2.4.1) (2025-05-14)
+
+
+### Bug Fixes
+
+* version ([b6ca87b](https://github.com/Strobotti/jsonapi-ts-deserializer/commit/b6ca87b04856e8c51298441b46fa59ebf2ad6a9e))
+
 # [2.3.0](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v2.2.0...v2.3.0) (2023-05-30)
 
 
