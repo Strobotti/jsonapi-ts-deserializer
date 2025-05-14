@@ -301,8 +301,12 @@ export class Deserializer implements RelationshipDeserializer {
       throw new Error('JSON-object must contain key `data`');
     }
 
-    this.rootItems = {};
-    this.entityStoreCollection = {};
+    // When skipUnknownEntities is true, we need to reset the rootItems and entityStoreCollection
+    // so that we can keep track of the skipped entities with each deserialization.
+    if (this.skipUnknownEntities) {
+      this.rootItems = {};
+      this.entityStoreCollection = {};
+    }
 
     if (Array.isArray(json.data)) {
       json.data.forEach((item: Item) => {
