@@ -359,6 +359,194 @@ const fileSystemExampleData3 = {
   },
 };
 
+const fileSystemExampleData4 = {
+  data: {
+    type: 'folders',
+    id: '1',
+    attributes: {
+      name: 'root',
+    },
+    relationships: {
+      children: {
+        data: [
+          {
+            type: 'folders',
+            id: '2',
+          },
+          {
+            type: 'files',
+            id: '3',
+          },
+          {
+            type: 'really-big-files',
+            id: '7',
+          }
+        ],
+      },
+    },
+  },
+  included: [
+    {
+      type: 'folders',
+      id: '2',
+      attributes: {
+        name: 'home',
+      },
+      relationships: {
+        children: {
+          data: [
+            {
+              type: 'files',
+              id: '4',
+            },
+            {
+              type: 'folders',
+              id: '5',
+            },
+            {
+              type: 'hidden-files',
+              id: '6',
+            },
+          ],
+        },
+      },
+    },
+    {
+      type: 'files',
+      id: '3',
+      attributes: {
+        name: 'swapfile',
+      },
+    },
+    {
+      type: 'files',
+      id: '4',
+      attributes: {
+        name: 'README.md',
+      },
+    },
+    {
+      type: 'folders',
+      id: '5',
+      attributes: {
+        name: 'juha',
+      },
+    },
+    {
+      type: 'hidden-files',
+      id: '6',
+      attributes: {
+        name: 'should not be deserialized',
+      },
+    },
+    {
+      type: 'really-big-files',
+      id: '7',
+      attributes: {
+        name: 'should not be deserialized',
+      },
+    }
+  ],
+};
+
+const fileSystemExampleData5 = {
+  data: [
+    {
+      type: 'folders',
+      id: '1',
+      attributes: {
+        name: 'root',
+      },
+      relationships: {
+        children: {
+          data: [
+            {
+              type: 'folders',
+              id: '2',
+            },
+            {
+              type: 'files',
+              id: '3',
+            },
+            {
+              type: 'really-big-files',
+              id: '7',
+            }
+          ],
+        },
+      },
+    },
+    {
+      type: 'unknown-folders',
+      id: '2',
+      attributes: {
+        name: 'should not be deserialized',
+      },
+    },
+  ],
+  included: [
+    {
+      type: 'folders',
+      id: '2',
+      attributes: {
+        name: 'home',
+      },
+      relationships: {
+        children: {
+          data: [
+            {
+              type: 'files',
+              id: '4',
+            },
+            {
+              type: 'folders',
+              id: '5',
+            },
+            {
+              type: 'hidden-files',
+              id: '6',
+            },
+          ],
+        },
+      },
+    },
+    {
+      type: 'files',
+      id: '3',
+      attributes: {
+        name: 'swapfile',
+      },
+    },
+    {
+      type: 'files',
+      id: '4',
+      attributes: {
+        name: 'README.md',
+      },
+    },
+    {
+      type: 'folders',
+      id: '5',
+      attributes: {
+        name: 'juha',
+      },
+    },
+    {
+      type: 'hidden-files',
+      id: '6',
+      attributes: {
+        name: 'should not be deserialized',
+      },
+    },
+    {
+      type: 'really-big-files',
+      id: '7',
+      attributes: {
+        name: 'should not be deserialized',
+      },
+    }
+  ],
+};
 type Folder = {
   id: number;
   name: string;
@@ -444,4 +632,60 @@ describe('Deserializer', () => {
 
     expect(rootItem).toMatchSnapshot();
   });
+
+  it('throws an error when serializer is not found for entity', () => {
+    const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer]);
+
+    expect(() => deserializer.consume(fileSystemExampleData4).getRootItem()).toThrow()
+  });
+
+  describe('skipUnkownEntities = true', () => {
+    it('does not throw an error when serializer is not found for entity and save the unknown entity type when deserializing object', () => {
+      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], { skipUnknownEntities: true });
+
+      const rootItem: Folder = deserializer.consume(fileSystemExampleData4).getRootItem();
+
+      expect(rootItem).toMatchSnapshot();
+
+      expect(deserializer.getSkippedEntities()).toEqual(['hidden-files', 'really-big-files']);
+
+      expect(JSON.stringify(rootItem)).not.toContain('should not be deserialized')
+    });
+
+    it('does not throw an error when serializer is not found for entity and save the unknown entity type when deserializing array', () => {
+      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], { skipUnknownEntities: true });
+
+      const rootItem: Folder[] = deserializer.consume(fileSystemExampleData5).getRootItems();
+
+      expect(rootItem).toMatchSnapshot();
+
+      expect(deserializer.getSkippedEntities()).toEqual(['hidden-files', 'really-big-files', 'unknown-folders']);
+
+      expect(JSON.stringify(rootItem)).not.toContain('should not be deserialized')
+    });
+
+    it('clears saved unknown entities on another call to getRootItem()', () => {
+      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], { skipUnknownEntities: true });
+
+      deserializer.consume(fileSystemExampleData4).getRootItem();
+
+      expect(deserializer.getSkippedEntities()).toEqual(['hidden-files', 'really-big-files']);
+
+      deserializer.consume(fileSystemExampleData2).getRootItem();
+
+      expect(deserializer.getSkippedEntities()).toEqual([]);
+    });
+
+    it('clears saved unknown entities on another call to getRootItems()', () => {
+      const deserializer: Deserializer = getDeserializer([folderDeserializer, fileDeserializer], { skipUnknownEntities: true });
+
+      deserializer.consume(fileSystemExampleData5).getRootItems();
+
+      expect(deserializer.getSkippedEntities()).toEqual(['hidden-files', 'really-big-files', 'unknown-folders']);
+
+      deserializer.consume(fileSystemExampleData).getRootItems();
+
+      expect(deserializer.getSkippedEntities()).toEqual([]);
+    });
+  })
 });
