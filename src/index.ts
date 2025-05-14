@@ -75,6 +75,14 @@ type EntityStoreCollection = { [key: string]: EntityStore };
 
 type ItemDeserializerRegistry = { [key: string]: ItemDeserializer<any> };
 
+interface DeserializerOptions {
+  /**
+   * If true, the deserializer will skip unknown entities (entities that do not have a registered ItemDeserializer). 
+   * Otherwise the deserializer will throw an error if it encounters an unknown entity.
+   */
+  skipUnknownEntities?: boolean;
+}
+
 export interface RelationshipDeserializer {
   /**
    * Returns whether the data for item's relationship with given name is present in the included -section.
@@ -85,7 +93,7 @@ export interface RelationshipDeserializer {
    */
   isRelationshipDataPresent(item: Item, name: string): boolean;
 
-  deserializeRelationship(item: Item, name: string): any;
+  deserializeRelationship(item: Item, name: string): any | null;
 
   deserializeRelationships(item: Item, name: string): any[];
 }
@@ -94,6 +102,22 @@ export class Deserializer implements RelationshipDeserializer {
   private rootItems: EntityStore = {};
   private entityStoreCollection: EntityStoreCollection = {};
   private itemDeserializerRegistry: ItemDeserializerRegistry = {};
+  private skipUnknownEntities = false;
+  private skippedEntities: string[] = [];
+
+  constructor({
+    skipUnknownEntities = false,
+  }: DeserializerOptions = {}) {
+    this.skipUnknownEntities = skipUnknownEntities;
+  }
+
+  /**
+   * Returns the list of skipped entities due to nonexisting deserializer. This is only available if skipUnknownEntities is set to true.
+   * This needs to be called after the call to getRootItem or getRootItems and before another call to them since the skipped entities are reset before each call.
+   */
+  public getSkippedEntities(): string[] {
+    return this.skippedEntities;
+  }
 
   public registerItemDeserializer(itemDeserializer: ItemDeserializer<any>): Deserializer {
     this.itemDeserializerRegistry[itemDeserializer.type] = itemDeserializer;
@@ -116,7 +140,15 @@ export class Deserializer implements RelationshipDeserializer {
     const item = this.rootItems[Object.keys(this.rootItems)[0]];
     const type = item.type;
 
-    return this.getDeserializerForType(type).deserialize(item, this);
+    this.skippedEntities = [];
+
+    const deserializer = this.getDeserializerForType(type)
+    
+    if (!deserializer) {
+      return null;
+    }
+
+    return deserializer.deserialize(item, this);
   }
 
   /**
@@ -129,10 +161,19 @@ export class Deserializer implements RelationshipDeserializer {
 
     const items: any[] = [];
 
+    this.skippedEntities = [];
+
     Object.keys(this.rootItems).forEach((id: string) => {
       const item = this.rootItems[id];
       const type = item.type;
-      items.push(this.getDeserializerForType(type).deserialize(item, this));
+
+      const deserializer = this.getDeserializerForType(type)
+
+      if (!deserializer) {
+        return;
+      }
+
+      items.push(deserializer.deserialize(item, this));
     });
 
     return items;
@@ -167,7 +208,7 @@ export class Deserializer implements RelationshipDeserializer {
    * @param item
    * @param name
    */
-  public deserializeRelationship(item: Item, name: string): any {
+  public deserializeRelationship(item: Item, name: string): any | null {
     if (!item?.relationships || !item.relationships[name] || !item.relationships[name]?.data) return null;
 
     const relationships: RelationshipItem | RelationshipItem[] | null | undefined = item.relationships[name]?.data;
@@ -183,7 +224,13 @@ export class Deserializer implements RelationshipDeserializer {
     const relationshipItem = this.getItemByTypeAndId(relationship.type, relationship.id);
     if (!relationshipItem) return null;
 
-    return this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this);
+    const deserializer = this.getDeserializerForType(relationship.type);
+
+    if (!deserializer) {
+      return null;
+    }
+
+    return deserializer.deserialize(relationshipItem, this);
   }
 
   /**
@@ -206,7 +253,13 @@ export class Deserializer implements RelationshipDeserializer {
 
       if (!relationshipItem) return;
 
-      ret.push(this.getDeserializerForType(relationship.type).deserialize(relationshipItem, this));
+      const deserializer = this.getDeserializerForType(relationship.type);
+
+      if (!deserializer) {
+        return;
+      }
+
+      ret.push(deserializer.deserialize(relationshipItem, this));
     });
 
     return ret;
@@ -225,9 +278,15 @@ export class Deserializer implements RelationshipDeserializer {
     return item;
   }
 
-  private getDeserializerForType(type: string): ItemDeserializer<any> {
+  private getDeserializerForType(type: string): ItemDeserializer<any> | null {
     const deserializer: ItemDeserializer<any> = this.itemDeserializerRegistry[type];
     if (!deserializer) {
+      if (this.skipUnknownEntities) {
+        this.skippedEntities.push(type);
+
+        return null;
+      } 
+
       throw new Error(`An ItemDeserializer for type ${type} is not registered.`);
     }
 
@@ -240,6 +299,13 @@ export class Deserializer implements RelationshipDeserializer {
   public consume(json: JsonApiPayload): Deserializer {
     if (!json.data) {
       throw new Error('JSON-object must contain key `data`');
+    }
+
+    // When skipUnknownEntities is true, we need to reset the rootItems and entityStoreCollection
+    // so that we can keep track of the skipped entities with each deserialization.
+    if (this.skipUnknownEntities) {
+      this.rootItems = {};
+      this.entityStoreCollection = {};
     }
 
     if (Array.isArray(json.data)) {
@@ -267,8 +333,8 @@ export class Deserializer implements RelationshipDeserializer {
 /**
  * Returns a Deserializer with the given ItemDeserializers registered.
  */
-export const getDeserializer = (itemDeserializers: ItemDeserializer<any>[]): Deserializer => {
-  const deserializer: Deserializer = new Deserializer();
+export const getDeserializer = (itemDeserializers: ItemDeserializer<any>[], options: DeserializerOptions = {}): Deserializer => {
+  const deserializer: Deserializer = new Deserializer(options);
 
   itemDeserializers.forEach((itemDeserializer: ItemDeserializer<any>) => {
     deserializer.registerItemDeserializer(itemDeserializer);

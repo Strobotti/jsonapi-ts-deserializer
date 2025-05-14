@@ -113,3 +113,61 @@ exports[`Deserializer deserializes the third file system example (single entity 
   "name": "root",
 }
 `;
+
+exports[`Deserializer skipUnkownEntities = true does not throw an error when serializer is not found for entity and save the unknown entity type when deserializing array 1`] = `
+[
+  {
+    "children": [
+      {
+        "children": [
+          {
+            "id": 4,
+            "name": "README.md",
+          },
+          {
+            "children": [],
+            "id": 5,
+            "name": "juha",
+          },
+        ],
+        "id": 2,
+        "name": "home",
+      },
+      {
+        "id": 3,
+        "name": "swapfile",
+      },
+    ],
+    "id": 1,
+    "name": "root",
+  },
+]
+`;
+
+exports[`Deserializer skipUnkownEntities = true does not throw an error when serializer is not found for entity and save the unknown entity type when deserializing object 1`] = `
+{
+  "children": [
+    {
+      "children": [
+        {
+          "id": 4,
+          "name": "README.md",
+        },
+        {
+          "children": [],
+          "id": 5,
+          "name": "juha",
+        },
+      ],
+      "id": 2,
+      "name": "home",
+    },
+    {
+      "id": 3,
+      "name": "swapfile",
+    },
+  ],
+  "id": 1,
+  "name": "root",
+}
+`;
