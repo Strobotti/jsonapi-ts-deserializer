@@ -9,6 +9,35 @@ const jsonapiOrgExampleData = {
   data: [
     {
       type: 'articles',
+      id: '2',
+      attributes: {
+        title: 'JSON:API paints my bikeshed!',
+      },
+      relationships: {
+        author: {
+          links: {
+            self: 'https://example.com/articles/2/relationships/author',
+            related: 'https://example.com/articles/2/author',
+          },
+          data: { type: 'people', id: '9' },
+        },
+        comments: {
+          links: {
+            self: 'https://example.com/articles/2/relationships/comments',
+            related: 'https://example.com/articles/2/comments',
+          },
+          data: [
+            { type: 'comments', id: '5' },
+            { type: 'comments', id: '12' },
+          ],
+        },
+      },
+      links: {
+        self: 'https://example.com/articles/2',
+      },
+    },
+    {
+      type: 'articles',
       id: '1',
       attributes: {
         title: 'JSON:API paints my bikeshed!',
@@ -593,6 +622,9 @@ describe('Deserializer', () => {
     ]).consume(jsonapiOrgExampleData);
 
     const rootItems: any[] = deserializer.getRootItems();
+
+    expect(rootItems[0].id.toString()).toBe(jsonapiOrgExampleData.data[0].id);
+    expect(rootItems[1].id.toString()).toBe(jsonapiOrgExampleData.data[1].id);
 
     expect(rootItems).toMatchSnapshot();
   });
