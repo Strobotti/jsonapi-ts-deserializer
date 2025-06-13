@@ -66,7 +66,7 @@ export type ItemDeserializer<T> = {
 /**
  * EntityStore contains the raw data for entities of certain type, indexed by the entity id.
  */
-type EntityStore = { [key: string]: Item };
+type EntityStore = { [key: string]: { data: Item, index: number } };
 
 /**
  * EntityStoreCollection contains the EntityStores, indexed by the entity type.
@@ -136,7 +136,7 @@ export class Deserializer implements RelationshipDeserializer {
     }
 
     const item = this.rootItems[Object.keys(this.rootItems)[0]];
-    const type = item.type;
+    const type = item.data.type;
 
     this.skippedEntities = [];
 
@@ -146,7 +146,7 @@ export class Deserializer implements RelationshipDeserializer {
       return null;
     }
 
-    return deserializer.deserialize(item, this);
+    return deserializer.deserialize(item.data, this);
   }
 
   /**
@@ -161,9 +161,10 @@ export class Deserializer implements RelationshipDeserializer {
 
     this.skippedEntities = [];
 
-    Object.keys(this.rootItems).forEach((id: string) => {
-      const item = this.rootItems[id];
-      const type = item.type;
+    const sortedItems = Object.values(this.rootItems).sort((a, b) => a.index - b.index);
+
+    sortedItems.forEach((item) => {
+      const type = item.data.type;
 
       const deserializer = this.getDeserializerForType(type);
 
@@ -171,7 +172,7 @@ export class Deserializer implements RelationshipDeserializer {
         return;
       }
 
-      items.push(deserializer.deserialize(item, this));
+      items.push(deserializer.deserialize(item.data, this));
     });
 
     return items;
@@ -267,7 +268,7 @@ export class Deserializer implements RelationshipDeserializer {
     if (!this.entityStoreCollection.hasOwnProperty(type)) {
       return null;
     }
-    const item: Item = this.entityStoreCollection[type][id];
+    const item: Item = this.entityStoreCollection[type][id].data;
 
     if (!item) {
       return null;
@@ -307,12 +308,12 @@ export class Deserializer implements RelationshipDeserializer {
     }
 
     if (Array.isArray(json.data)) {
-      json.data.forEach((item: Item) => {
-        this.rootItems[item.id] = item;
+      json.data.forEach((item: Item, index: number) => {
+        this.rootItems[item.id] = { data: item, index };
         // TODO the root items _should_ really be included in the collection as well, but that might cause circular references
       });
     } else {
-      this.rootItems[json.data.id] = json.data;
+      this.rootItems[json.data.id] = { data: json.data, index: 0 };
     }
 
     if (Array.isArray(json.included)) {
@@ -321,7 +322,7 @@ export class Deserializer implements RelationshipDeserializer {
           this.entityStoreCollection[item.type] = {};
         }
 
-        this.entityStoreCollection[item.type][item.id] = item;
+        this.entityStoreCollection[item.type][item.id] = { data: item, index: 0 };
       });
     }
     return this;
