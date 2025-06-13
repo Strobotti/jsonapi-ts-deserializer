@@ -66,7 +66,7 @@ export type ItemDeserializer<T> = {
 /**
  * EntityStore contains the raw data for entities of certain type, indexed by the entity id.
  */
-type EntityStore = { [key: string]: { data: Item, index: number } };
+type EntityStore = { [key: string]: { data: Item; index: number } };
 
 /**
  * EntityStoreCollection contains the EntityStores, indexed by the entity type.

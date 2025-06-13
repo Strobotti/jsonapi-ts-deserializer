@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v2.4.1...v2.4.2) (2025-06-13)
+
+
+### Bug Fixes
+
+* make sure that deseralzers output data stays in the same order as when consumed ([b3700b0](https://github.com/Strobotti/jsonapi-ts-deserializer/commit/b3700b0f7489f0d5a37b9f2966176930f9b06985))
+
 ## [2.4.1](https://github.com/Strobotti/jsonapi-ts-deserializer/compare/v2.4.0...v2.4.1) (2025-05-14)
 
 
